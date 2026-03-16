@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/prime_background">
+
+    <ScrollView
+        android:id="@+id/detail_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Backdrop -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="400dp">
+
+                <ImageView
+                    android:id="@+id/detail_backdrop"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@null" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/hero_gradient_bottom" />
+
+                <!-- Title overlay -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:orientation="vertical"
+                    android:paddingStart="48dp"
+                    android:paddingEnd="48dp"
+                    android:paddingBottom="24dp">
+
+                    <TextView
+                        android:id="@+id/detail_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/prime_text"
+                        android:textSize="40sp"
+                        android:textStyle="bold"
+                        android:maxLines="2"
+                        android:ellipsize="end" />
+
+                    <TextView
+                        android:id="@+id/detail_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textColor="@color/prime_text_sec"
+                        android:textSize="20sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Action buttons -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="48dp"
+                android:paddingTop="12dp">
+
+                <Button
+                    android:id="@+id/detail_play_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="52dp"
+                    android:minWidth="180dp"
+                    android:text="@string/play_button"
+                    android:textColor="@color/prime_text"
+                    android:textSize="18sp"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/prime_accent"
+                    android:focusable="true" />
+
+                <Button
+                    android:id="@+id/detail_live_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="52dp"
+                    android:minWidth="180dp"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/live_button"
+                    android:textColor="@color/prime_text"
+                    android:textSize="18sp"
+                    android:textAllCaps="false"
+                    android:backgroundTint="#CC0000"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- Season tabs -->
+            <androidx.leanback.widget.HorizontalGridView
+                android:id="@+id/season_tabs_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingStart="48dp"
+                android:paddingEnd="48dp"
+                android:clipToPadding="false" />
+
+            <!-- Episode list -->
+            <androidx.leanback.widget.HorizontalGridView
+                android:id="@+id/episodes_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingStart="48dp"
+                android:paddingEnd="48dp"
+                android:paddingBottom="32dp"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Loading overlay -->
+    <LinearLayout
+        android:id="@+id/detail_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/prime_accent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/loading"
+            android:textColor="@color/prime_text_sec"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</FrameLayout>

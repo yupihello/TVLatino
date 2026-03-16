@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/player_overlay_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone">
+
+    <!-- Top bar: gradient fade from black -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="top">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/overlay_gradient_top" />
+
+        <TextView
+            android:id="@+id/overlay_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:paddingTop="24dp"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="4" />
+    </FrameLayout>
+
+    <!-- Bottom bar: gradient fade from black + controls -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <!-- Gradient background -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/overlay_gradient_bottom" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:paddingBottom="28dp">
+
+            <!-- SeekBar -->
+            <SeekBar
+                android:id="@+id/overlay_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="1000"
+                android:progressTint="@color/prime_accent"
+                android:thumbTint="@color/prime_accent"
+                android:progressBackgroundTint="#55FFFFFF"
+                android:focusable="true" />
+
+            <!-- Time + controls row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp">
+
+                <!-- Current time -->
+                <TextView
+                    android:id="@+id/overlay_time_current"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0:00"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="18sp" />
+
+                <!-- Spacer -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- Rewind -->
+                <ImageButton
+                    android:id="@+id/overlay_rewind"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@android:drawable/ic_media_rew"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/skip_backward"
+                    android:focusable="true"
+                    android:tint="#FFFFFF" />
+
+                <!-- Play/Pause -->
+                <ImageButton
+                    android:id="@+id/overlay_play_pause"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:src="@android:drawable/ic_media_pause"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/play_button"
+                    android:focusable="true"
+                    android:tint="#FFFFFF" />
+
+                <!-- Forward -->
+                <ImageButton
+                    android:id="@+id/overlay_forward"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@android:drawable/ic_media_ff"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/skip_forward"
+                    android:focusable="true"
+                    android:tint="#FFFFFF" />
+
+                <!-- Spacer -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- Total time -->
+                <TextView
+                    android:id="@+id/overlay_time_total"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0:00"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="18sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Prime Video palette -->
+    <color name="prime_background">#0F171E</color>
+    <color name="prime_surface">#1A2734</color>
+    <color name="prime_card">#243447</color>
+    <color name="prime_accent">#00A8E1</color>
+    <color name="prime_text">#FFFFFF</color>
+    <color name="prime_text_sec">#8197A4</color>
+    <color name="prime_focus_glow">#4000A8E1</color>
+
+    <!-- Legacy (kept for compat) -->
+    <color name="brand_primary">#00A8E1</color>
+    <color name="brand_primary_dark">#0F171E</color>
+    <color name="brand_accent">#00A8E1</color>
+    <color name="search_opaque">#CC0D47A1</color>
+    <color name="card_background">#243447</color>
+    <color name="card_text">#FFFFFF</color>
+    <color name="detail_background">#0F171E</color>
+</resources>

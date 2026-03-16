@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="480dp"
+    android:focusable="false">
+
+    <!-- Backdrop image -->
+    <ImageView
+        android:id="@+id/hero_backdrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null" />
+
+    <!-- Bottom gradient overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/hero_gradient_bottom" />
+
+    <!-- Title and buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:paddingStart="60dp"
+        android:paddingEnd="60dp"
+        android:paddingBottom="36dp">
+
+        <TextView
+            android:id="@+id/hero_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="@color/prime_text"
+            android:textSize="42sp"
+            android:textStyle="bold"
+            android:shadowColor="#88000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4" />
+
+        <TextView
+            android:id="@+id/hero_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/prime_text_sec"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/hero_play_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:minWidth="200dp"
+                android:text="@string/play_button"
+                android:textColor="@color/prime_text"
+                android:textSize="20sp"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/prime_accent"
+                android:focusable="true"
+                android:nextFocusRight="@+id/hero_details_btn" />
+
+            <Button
+                android:id="@+id/hero_details_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:minWidth="200dp"
+                android:layout_marginStart="20dp"
+                android:text="@string/details_button"
+                android:textColor="@color/prime_text"
+                android:textSize="20sp"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/prime_surface"
+                android:focusable="true"
+                android:nextFocusLeft="@+id/hero_play_btn" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

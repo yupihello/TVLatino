@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.StreamCaster" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/prime_background</item>
+        <item name="colorPrimary">@color/prime_accent</item>
+        <item name="colorPrimaryDark">@color/prime_background</item>
+        <item name="colorAccent">@color/prime_accent</item>
+        <item name="android:colorPrimary">@color/prime_accent</item>
+        <item name="android:colorAccent">@color/prime_accent</item>
+    </style>
+
+    <style name="Theme.StreamCaster.Playback" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+</resources>

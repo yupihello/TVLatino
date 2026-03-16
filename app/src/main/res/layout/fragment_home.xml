@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/prime_background">
+
+    <LinearLayout
+        android:id="@+id/home_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Hero Banner -->
+        <include
+            android:id="@+id/hero_banner"
+            layout="@layout/item_hero_banner"
+            android:layout_width="match_parent"
+            android:layout_height="400dp" />
+
+        <!-- Continue watching label -->
+        <TextView
+            android:id="@+id/continue_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="60dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="10dp"
+            android:text="@string/continue_watching"
+            android:textColor="@color/prime_text"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <!-- Continue watching row -->
+        <androidx.leanback.widget.HorizontalGridView
+            android:id="@+id/continue_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingStart="60dp"
+            android:paddingEnd="60dp"
+            android:visibility="gone" />
+
+        <!-- Category label -->
+        <TextView
+            android:id="@+id/series_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="60dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="10dp"
+            android:text="Series"
+            android:textColor="@color/prime_text"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- Horizontal series row -->
+        <androidx.leanback.widget.HorizontalGridView
+            android:id="@+id/series_row"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingStart="60dp"
+            android:paddingEnd="60dp" />
+
+    </LinearLayout>
+
+    <!-- Loading indicator -->
+    <LinearLayout
+        android:id="@+id/loading_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/prime_accent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/loading"
+            android:textColor="@color/prime_text_sec"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</FrameLayout>

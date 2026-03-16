@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TV Latino</string>
+    <string name="loading">Cargando…</string>
+    <string name="error_loading">Error al cargar contenido</string>
+    <string name="no_episodes">No se encontraron episodios</string>
+    <string name="season_label">Temporada %d</string>
+    <string name="episode_label">Episodio %d</string>
+    <string name="server_1">Servidor 1</string>
+    <string name="server_2">Servidor 2</string>
+    <string name="extracting_video">Extrayendo video…</string>
+    <string name="error_extracting">No se pudo extraer el video</string>
+    <string name="error_playback">Error de reproducción</string>
+    <string name="retry">Reintentar</string>
+    <string name="browse_title">TV Latino</string>
+    <string name="play_button">Reproducir</string>
+    <string name="details_button">Detalles</string>
+    <string name="skip_forward">Adelantar 10s</string>
+    <string name="skip_backward">Retroceder 10s</string>
+    <string name="continue_watching">Continuar viendo</string>
+    <string name="live_button">Live</string>
+    <string name="next_episode">Siguiente episodio</string>
+</resources>
