@@ -83,8 +83,26 @@ public class TvSeriesLatinoScraper {
         // Expand Dragon Ball: replace single entry with individual sub-series
         allSeries = expandDragonBall(allSeries);
 
+        // Replace Los Simpsons from tvserieslatino with simpsonizados.me (español latino)
+        allSeries = replaceSimpsons(allSeries);
+
         Log.d(TAG, "Found " + allSeries.size() + " unique series");
         return allSeries;
+    }
+
+    private List<Series> replaceSimpsons(List<Series> series) {
+        List<Series> result = new ArrayList<>();
+        for (Series s : series) {
+            if (s.getPageUrl().contains("simpsons") || s.getPageUrl().contains("simpson")) {
+                // Replace with simpsonizados.me source (español latino)
+                result.add(new Series("Los Simpsons", s.getThumbnailUrl(),
+                        "https://simpsonizados.me/", ""));
+                Log.d(TAG, "Replaced Simpsons with simpsonizados.me");
+            } else {
+                result.add(s);
+            }
+        }
+        return result;
     }
 
     private List<Series> expandDragonBall(List<Series> series) {
@@ -138,6 +156,11 @@ public class TvSeriesLatinoScraper {
      */
     public Map<Integer, List<Episode>> scrapeSeriesPage(String seriesUrl, String seriesThumbnail)
             throws IOException {
+        // Simpsonizados.me has its own scraper
+        if (seriesUrl.contains("simpsonizados.me")) {
+            return new SimpsonizadosScraper().scrapeAllEpisodes(seriesThumbnail);
+        }
+
         Document doc = Jsoup.connect(seriesUrl)
                 .userAgent(USER_AGENT)
                 .timeout(TIMEOUT_MS)
@@ -232,35 +255,45 @@ public class TvSeriesLatinoScraper {
     private Map<Integer, List<Episode>> scrapeServidorFormat(Document doc, String seriesThumbnail) {
         Map<Integer, List<Episode>> seasonEpisodes = new LinkedHashMap<>();
 
-        // Find any script that has functions with "var urls = ["
+        // Concatenate ALL script tags that have video functions
         Elements scripts = doc.select("script");
-        String fullScript = "";
+        StringBuilder sb = new StringBuilder();
         for (Element script : scripts) {
             String content = script.html();
-            if (content.contains("var urls") && content.contains("destino")) {
-                fullScript = content;
-                break;
+            if (content.contains("var urls") || content.contains("destino")) {
+                sb.append(content).append("\n");
             }
         }
+        String fullScript = sb.toString();
 
         if (fullScript.isEmpty()) return seasonEpisodes;
 
-        // Find all function names that contain url arrays (e.g. Servidor1, ServiDigi1, etc.)
-        List<String> funcNames = findUrlArrayFunctions(fullScript);
-        Log.d(TAG, "Found URL array functions: " + funcNames);
+        // Find all function names that take (id) parameter
+        List<String> funcNames = new ArrayList<>();
+        Pattern funcP = Pattern.compile("function\\s+(\\w+)\\s*\\(\\s*id\\s*\\)");
+        Matcher funcM = funcP.matcher(fullScript);
+        while (funcM.find()) {
+            funcNames.add(funcM.group(1));
+        }
+        Log.d(TAG, "Found functions with (id): " + funcNames);
 
+        // Extract URL arrays from each function, keep first two that have URLs
         List<String> server1Urls = new ArrayList<>();
         List<String> server2Urls = new ArrayList<>();
 
         for (String funcName : funcNames) {
             List<String> urls = extractUrlArray(fullScript, funcName);
-            if (server1Urls.isEmpty()) {
-                server1Urls = urls;
-            } else if (server2Urls.isEmpty()) {
-                server2Urls = urls;
+            if (!urls.isEmpty()) {
+                if (server1Urls.isEmpty()) {
+                    server1Urls = urls;
+                } else if (server2Urls.isEmpty()) {
+                    server2Urls = urls;
+                    break; // Got two, enough
+                }
             }
         }
 
+        // Use the server with more URLs as primary
         List<String> primaryUrls = server1Urls.size() >= server2Urls.size()
                 ? server1Urls : server2Urls;
         List<String> secondaryUrls = server1Urls.size() >= server2Urls.size()
@@ -484,30 +517,45 @@ public class TvSeriesLatinoScraper {
     private List<String> extractUrlArray(String script, String functionName) {
         List<String> urls = new ArrayList<>();
 
+        // Find the function declaration
         String funcPattern = "function\\s+" + functionName + "\\s*\\([^)]*\\)\\s*\\{";
         Pattern funcRegex = Pattern.compile(funcPattern);
         Matcher funcMatcher = funcRegex.matcher(script);
 
         if (!funcMatcher.find()) return urls;
 
-        int funcStart = funcMatcher.end();
-        int braceCount = 1;
-        int funcEnd = funcStart;
-        for (int i = funcStart; i < script.length() && braceCount > 0; i++) {
-            if (script.charAt(i) == '{') braceCount++;
-            else if (script.charAt(i) == '}') braceCount--;
-            funcEnd = i;
+        // Find "var urls = [" after the function start
+        int searchFrom = funcMatcher.end();
+        int urlsIdx = script.indexOf("var urls", searchFrom);
+        if (urlsIdx < 0 || urlsIdx > searchFrom + 200) return urls; // urls decl should be near start
+
+        int bracketStart = script.indexOf('[', urlsIdx);
+        if (bracketStart < 0) return urls;
+
+        // Find matching closing bracket - skip brackets inside strings
+        int bracketEnd = -1;
+        boolean inString = false;
+        char stringChar = 0;
+        for (int i = bracketStart + 1; i < script.length(); i++) {
+            char c = script.charAt(i);
+            if (inString) {
+                if (c == stringChar && script.charAt(i - 1) != '\\') {
+                    inString = false;
+                }
+            } else {
+                if (c == '"' || c == '\'') {
+                    inString = true;
+                    stringChar = c;
+                } else if (c == ']') {
+                    bracketEnd = i;
+                    break;
+                }
+            }
         }
 
-        String funcBody = script.substring(funcStart, funcEnd);
+        if (bracketEnd < 0) return urls;
 
-        Pattern arrayPattern = Pattern.compile(
-                "(?:var\\s+)?urls\\s*=\\s*\\[(.*?)\\]", Pattern.DOTALL);
-        Matcher arrayMatcher = arrayPattern.matcher(funcBody);
-
-        if (!arrayMatcher.find()) return urls;
-
-        String arrayContent = arrayMatcher.group(1);
+        String arrayContent = script.substring(bracketStart + 1, bracketEnd);
         Pattern urlPattern = Pattern.compile("[\"']([^\"']*)[\"']");
         Matcher urlMatcher = urlPattern.matcher(arrayContent);
 

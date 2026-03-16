@@ -16,14 +16,32 @@
             android:layout_height="match_parent"
             android:background="@drawable/overlay_gradient_top" />
 
-        <TextView
-            android:id="@+id/overlay_title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:paddingStart="40dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="24dp"
             android:paddingEnd="40dp"
-            android:paddingTop="24dp"
+            android:paddingTop="20dp">
+
+            <ImageButton
+                android:id="@+id/overlay_back_btn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:background="@android:color/transparent"
+                android:tint="#FFFFFF"
+                android:contentDescription="Back"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/overlay_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
             android:textColor="#FFFFFF"
             android:textSize="28sp"
             android:textStyle="bold"
@@ -33,6 +51,7 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="4" />
+        </LinearLayout>
     </FrameLayout>
 
     <!-- Bottom bar: gradient fade from black + controls -->

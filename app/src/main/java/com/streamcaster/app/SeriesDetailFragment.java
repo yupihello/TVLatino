@@ -52,6 +52,7 @@ public class SeriesDetailFragment extends Fragment
     private ContentCache cache;
     private Button playBtn;
     private Button liveBtn;
+    private android.widget.ImageButton backBtn;
     private int resumeSeason = -1;
     private int resumeEpisodeNum = -1;
     private long resumePositionMs = 0;
@@ -91,6 +92,11 @@ public class SeriesDetailFragment extends Fragment
         loadingView = view.findViewById(R.id.detail_loading);
         playBtn = view.findViewById(R.id.detail_play_btn);
         liveBtn = view.findViewById(R.id.detail_live_btn);
+        backBtn = view.findViewById(R.id.detail_back_btn);
+
+        backBtn.setOnClickListener(v -> {
+            if (getActivity() != null) getActivity().onBackPressed();
+        });
 
         cache = new ContentCache(requireContext());
 

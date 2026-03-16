@@ -152,6 +152,12 @@ public class PlaybackActivity extends FragmentActivity {
 
         cache = new ContentCache(this);
 
+        // Back button in overlay
+        findViewById(R.id.overlay_back_btn).setOnClickListener(v -> {
+            saveCurrentProgress();
+            finish();
+        });
+
         setupOverlayControls();
 
         // Read intent extras
@@ -520,6 +526,17 @@ public class PlaybackActivity extends FragmentActivity {
                 "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
 
         resolverWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                // Auto-submit videok.pro play button form
+                if (url != null && url.contains("videok.pro/e/")) {
+                    Log.d(TAG, "videok.pro loaded, auto-submitting form");
+                    view.evaluateJavascript(
+                            "if(document.getElementById('F1')){document.getElementById('F1').submit();}",
+                            null);
+                }
+            }
+
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view,
                                                                WebResourceRequest request) {
