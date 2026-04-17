@@ -15,7 +15,7 @@
             android:id="@+id/hero_banner"
             layout="@layout/item_hero_banner"
             android:layout_width="match_parent"
-            android:layout_height="400dp" />
+            android:layout_height="300dp" />
 
         <!-- Continue watching label -->
         <TextView
@@ -34,6 +34,29 @@
         <!-- Continue watching row -->
         <androidx.leanback.widget.HorizontalGridView
             android:id="@+id/continue_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingStart="60dp"
+            android:paddingEnd="60dp"
+            android:visibility="gone" />
+
+        <!-- Favorites label -->
+        <TextView
+            android:id="@+id/fav_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="60dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="10dp"
+            android:text="Mis Favoritos"
+            android:textColor="@color/prime_text"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <androidx.leanback.widget.HorizontalGridView
+            android:id="@+id/fav_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
@@ -76,18 +99,34 @@
         android:orientation="vertical">
 
         <ProgressBar
+            android:id="@+id/loading_spinner"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:indeterminate="true"
             android:indeterminateTint="@color/prime_accent" />
 
         <TextView
+            android:id="@+id/loading_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/loading"
             android:textColor="@color/prime_text_sec"
             android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/retry_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginTop="20dp"
+            android:minWidth="180dp"
+            android:text="Reintentar"
+            android:textColor="@color/prime_text"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:backgroundTint="@color/prime_accent"
+            android:focusable="true"
+            android:visibility="gone" />
     </LinearLayout>
 
 </FrameLayout>

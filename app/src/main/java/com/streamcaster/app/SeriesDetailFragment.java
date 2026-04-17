@@ -21,6 +21,7 @@ import androidx.leanback.widget.HorizontalGridView;
 import com.bumptech.glide.Glide;
 import com.streamcaster.app.models.Episode;
 import com.streamcaster.app.models.Series;
+import com.streamcaster.app.models.WatchProgress;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,6 +53,9 @@ public class SeriesDetailFragment extends Fragment
     private ContentCache cache;
     private Button playBtn;
     private Button liveBtn;
+    private Button continueBtn;
+    private android.widget.ImageButton favBtn;
+    private FavoritesStore favStore;
     private android.widget.ImageButton backBtn;
     private int resumeSeason = -1;
     private int resumeEpisodeNum = -1;
@@ -92,10 +96,13 @@ public class SeriesDetailFragment extends Fragment
         loadingView = view.findViewById(R.id.detail_loading);
         playBtn = view.findViewById(R.id.detail_play_btn);
         liveBtn = view.findViewById(R.id.detail_live_btn);
+        continueBtn = view.findViewById(R.id.detail_continue_btn);
+        favBtn = view.findViewById(R.id.detail_fav_btn);
         backBtn = view.findViewById(R.id.detail_back_btn);
+        favStore = new FavoritesStore(requireContext());
 
         backBtn.setOnClickListener(v -> {
-            if (getActivity() != null) getActivity().onBackPressed();
+            if (getActivity() != null) getActivity().getOnBackPressedDispatcher().onBackPressed();
         });
 
         cache = new ContentCache(requireContext());
@@ -122,6 +129,15 @@ public class SeriesDetailFragment extends Fragment
 
         // Live button: shuffle play random episodes continuously
         liveBtn.setOnClickListener(v -> startLiveMode());
+
+        updateFavIcon();
+        favBtn.setOnClickListener(v -> {
+            boolean now = favStore.toggle(series);
+            updateFavIcon();
+            Toast.makeText(getActivity(),
+                    now ? "Añadido a Favoritos" : "Quitado de Favoritos",
+                    Toast.LENGTH_SHORT).show();
+        });
 
         loadEpisodes();
     }
@@ -230,8 +246,32 @@ public class SeriesDetailFragment extends Fragment
             if (resumeEp != null) {
                 resumeSeason = -1; // Only auto-resume once
                 launchPlayback(resumeEp, resumePositionMs, false);
+                return;
             }
         }
+
+        // Show Continuar button if there's saved progress for this series
+        WatchProgress wp = cache.loadAllWatchProgress().get(series.getPageUrl());
+        if (wp != null && wp.getPositionMs() > 5000) {
+            Episode ep = findEpisode(wp.getSeasonNumber(), wp.getEpisodeNumber());
+            if (ep != null) {
+                final Episode resumeEpFinal = ep;
+                final long posFinal = wp.getPositionMs();
+                continueBtn.setText(String.format(java.util.Locale.US,
+                        "Continuar T%d E%d", wp.getSeasonNumber(), wp.getEpisodeNumber()));
+                continueBtn.setVisibility(View.VISIBLE);
+                continueBtn.setOnClickListener(v -> launchPlayback(resumeEpFinal, posFinal, false));
+                continueBtn.requestFocus();
+            }
+        }
+    }
+
+    private void updateFavIcon() {
+        if (favBtn == null || series == null) return;
+        boolean isFav = favStore.isFavorite(series.getPageUrl());
+        favBtn.setImageResource(isFav
+                ? android.R.drawable.btn_star_big_on
+                : android.R.drawable.btn_star_big_off);
     }
 
     private Episode findEpisode(int season, int episodeNum) {

@@ -36,9 +36,15 @@ public class HomeFragment extends Fragment implements SeriesCardAdapter.OnSeries
 
     private View homeContent;
     private View loadingContainer;
+    private View loadingSpinner;
+    private TextView loadingText;
+    private Button retryBtn;
     private HorizontalGridView seriesRow;
     private HorizontalGridView continueRow;
+    private HorizontalGridView favRow;
     private TextView continueLabel;
+    private TextView favLabel;
+    private FavoritesStore favStore;
     private ImageView heroBackdrop;
     private TextView heroTitle;
     private TextView heroCategory;
@@ -61,9 +67,19 @@ public class HomeFragment extends Fragment implements SeriesCardAdapter.OnSeries
 
         homeContent = view.findViewById(R.id.home_content);
         loadingContainer = view.findViewById(R.id.loading_container);
+        loadingSpinner = view.findViewById(R.id.loading_spinner);
+        loadingText = view.findViewById(R.id.loading_text);
+        retryBtn = view.findViewById(R.id.retry_btn);
+        retryBtn.setOnClickListener(v -> {
+            showLoading();
+            loadContent();
+        });
         seriesRow = view.findViewById(R.id.series_row);
         continueRow = view.findViewById(R.id.continue_row);
         continueLabel = view.findViewById(R.id.continue_label);
+        favRow = view.findViewById(R.id.fav_row);
+        favLabel = view.findViewById(R.id.fav_label);
+        favStore = new FavoritesStore(requireContext());
 
         View heroBanner = view.findViewById(R.id.hero_banner);
         heroBackdrop = heroBanner.findViewById(R.id.hero_backdrop);
@@ -75,6 +91,7 @@ public class HomeFragment extends Fragment implements SeriesCardAdapter.OnSeries
         float density = getResources().getDisplayMetrics().density;
         seriesRow.setRowHeight((int) (240 * density));
         continueRow.setRowHeight((int) (310 * density));
+        favRow.setRowHeight((int) (240 * density));
 
         cache = new ContentCache(requireContext());
         loadContent();
@@ -85,6 +102,20 @@ public class HomeFragment extends Fragment implements SeriesCardAdapter.OnSeries
         super.onResume();
         // Refresh "Continue watching" when returning from playback
         refreshContinueWatching();
+        refreshFavorites();
+    }
+
+    private void refreshFavorites() {
+        if (favStore == null || favRow == null) return;
+        List<Series> favs = favStore.getAll();
+        if (favs.isEmpty()) {
+            favLabel.setVisibility(View.GONE);
+            favRow.setVisibility(View.GONE);
+        } else {
+            favLabel.setVisibility(View.VISIBLE);
+            favRow.setVisibility(View.VISIBLE);
+            favRow.setAdapter(new SeriesCardAdapter(favs, this));
+        }
     }
 
     private void refreshContinueWatching() {
@@ -151,9 +182,7 @@ public class HomeFragment extends Fragment implements SeriesCardAdapter.OnSeries
                     if (getActivity() == null || !isAdded()) return;
 
                     if (result.isEmpty()) {
-                        loadingContainer.setVisibility(View.GONE);
-                        Toast.makeText(getActivity(),
-                                R.string.error_loading, Toast.LENGTH_LONG).show();
+                        showError();
                         return;
                     }
 
@@ -163,14 +192,27 @@ public class HomeFragment extends Fragment implements SeriesCardAdapter.OnSeries
             } catch (Exception e) {
                 Log.e(TAG, "Error loading content", e);
                 mainHandler.post(() -> {
-                    if (getActivity() != null && isAdded()) {
-                        loadingContainer.setVisibility(View.GONE);
-                        Toast.makeText(getActivity(),
-                                R.string.error_loading, Toast.LENGTH_LONG).show();
-                    }
+                    if (getActivity() != null && isAdded()) showError();
                 });
             }
         });
+    }
+
+    private void showLoading() {
+        loadingContainer.setVisibility(View.VISIBLE);
+        homeContent.setVisibility(View.GONE);
+        loadingSpinner.setVisibility(View.VISIBLE);
+        loadingText.setText(R.string.loading);
+        retryBtn.setVisibility(View.GONE);
+    }
+
+    private void showError() {
+        loadingContainer.setVisibility(View.VISIBLE);
+        homeContent.setVisibility(View.GONE);
+        loadingSpinner.setVisibility(View.GONE);
+        loadingText.setText(R.string.error_loading);
+        retryBtn.setVisibility(View.VISIBLE);
+        retryBtn.requestFocus();
     }
 
     private void showData(List<Series> data) {
@@ -198,6 +240,7 @@ public class HomeFragment extends Fragment implements SeriesCardAdapter.OnSeries
 
         // Show continue watching row if there's history
         refreshContinueWatching();
+        refreshFavorites();
     }
 
     @Override

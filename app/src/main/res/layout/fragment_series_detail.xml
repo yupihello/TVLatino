@@ -4,19 +4,6 @@
     android:layout_height="match_parent"
     android:background="@color/prime_background">
 
-    <!-- Back button -->
-    <ImageButton
-        android:id="@+id/detail_back_btn"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:src="@android:drawable/ic_menu_revert"
-        android:background="@android:color/transparent"
-        android:tint="#FFFFFF"
-        android:contentDescription="Back"
-        android:focusable="true"
-        android:elevation="10dp" />
-
     <ScrollView
         android:id="@+id/detail_scroll"
         android:layout_width="match_parent"
@@ -30,7 +17,7 @@
             <!-- Backdrop -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="400dp">
+                android:layout_height="280dp">
 
                 <ImageView
                     android:id="@+id/detail_backdrop"
@@ -84,6 +71,20 @@
                 android:paddingTop="12dp">
 
                 <Button
+                    android:id="@+id/detail_continue_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="52dp"
+                    android:minWidth="200dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="Continuar"
+                    android:textColor="@color/prime_text"
+                    android:textSize="18sp"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/prime_accent"
+                    android:focusable="true"
+                    android:visibility="gone" />
+
+                <Button
                     android:id="@+id/detail_play_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="52dp"
@@ -92,7 +93,7 @@
                     android:textColor="@color/prime_text"
                     android:textSize="18sp"
                     android:textAllCaps="false"
-                    android:backgroundTint="@color/prime_accent"
+                    android:backgroundTint="#3D4A5A"
                     android:focusable="true" />
 
                 <Button
@@ -107,6 +108,18 @@
                     android:textAllCaps="false"
                     android:backgroundTint="#CC0000"
                     android:focusable="true" />
+
+                <ImageButton
+                    android:id="@+id/detail_fav_btn"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="16dp"
+                    android:background="#3D4A5A"
+                    android:src="@android:drawable/btn_star_big_off"
+                    android:tint="#FFFFFF"
+                    android:scaleType="center"
+                    android:focusable="true"
+                    android:contentDescription="Favorito" />
             </LinearLayout>
 
             <!-- Season tabs -->
@@ -132,6 +145,21 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <!-- Back button (on top of ScrollView) -->
+    <ImageButton
+        android:id="@+id/detail_back_btn"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_margin="12dp"
+        android:src="@android:drawable/ic_menu_revert"
+        android:background="#99000000"
+        android:tint="#FFFFFF"
+        android:contentDescription="Back"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:clickable="true"
+        android:elevation="20dp" />
 
     <!-- Loading overlay -->
     <LinearLayout
