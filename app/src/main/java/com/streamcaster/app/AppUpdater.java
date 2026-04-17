@@ -67,8 +67,11 @@ public class AppUpdater {
 
                 JSONObject release = new JSONObject(body);
                 String tagName = release.optString("tag_name", "");
-                int remoteVersion = parseVersionCode(tagName);
-                int localVersion = getLocalVersionCode();
+                int remoteVersion = parseVersionNumber(tagName);
+                int localVersion = parseVersionNumber(getLocalVersionName());
+                Log.d(TAG, "Update check: local=" + localVersion
+                        + " (" + getLocalVersionName() + ") remote=" + remoteVersion
+                        + " (" + tagName + ")");
 
                 if (remoteVersion > localVersion) {
                     // Find APK asset in release
@@ -163,24 +166,26 @@ public class AppUpdater {
         }
     }
 
-    private int getLocalVersionCode() {
+    private String getLocalVersionName() {
         try {
             return activity.getPackageManager()
-                    .getPackageInfo(activity.getPackageName(), 0).versionCode;
+                    .getPackageInfo(activity.getPackageName(), 0).versionName;
         } catch (Exception e) {
-            return 0;
+            return "0";
         }
     }
 
-    /** Parses "v2" or "v1.2" to integer versionCode (2, 12) */
-    private int parseVersionCode(String tag) {
+    /** Parses "v1.2" or "1.2.3" into a comparable int (major*10000 + minor*100 + patch). */
+    private int parseVersionNumber(String s) {
+        if (s == null) return 0;
         try {
-            String num = tag.replaceAll("[^0-9.]", "");
-            if (num.contains(".")) {
-                String[] parts = num.split("\\.");
-                return Integer.parseInt(parts[0]) * 10 + Integer.parseInt(parts[1]);
-            }
-            return Integer.parseInt(num);
+            String num = s.replaceAll("[^0-9.]", "");
+            if (num.isEmpty()) return 0;
+            String[] parts = num.split("\\.");
+            int major = parts.length > 0 ? Integer.parseInt(parts[0]) : 0;
+            int minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+            int patch = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
+            return major * 10000 + minor * 100 + patch;
         } catch (Exception e) {
             return 0;
         }

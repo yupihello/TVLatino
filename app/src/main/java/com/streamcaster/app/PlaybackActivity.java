@@ -591,18 +591,40 @@ public class PlaybackActivity extends FragmentActivity {
                     resolveAndPlay(fallback);
                 }
             }
-        }, 15000);
+        }, 25000);
 
+        final String finalEmbedUrl = embedUrl;
         resolverWebView.postDelayed(() -> {
             if (!videoResolved) {
                 Log.w(TAG, "Timeout waiting for video URL");
-                Toast.makeText(this, R.string.error_extracting, Toast.LENGTH_LONG).show();
-                finish();
+                showExtractionErrorDialog(finalEmbedUrl);
             }
-        }, 30000);
+        }, 60000);
 
         Log.d(TAG, "Loading embed URL: " + embedUrl);
         resolverWebView.loadUrl(embedUrl);
+    }
+
+    private void showExtractionErrorDialog(String embedUrl) {
+        if (isFinishing()) return;
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("No se pudo extraer el video")
+                .setMessage("El servidor no respondió a tiempo. ¿Reintentar?")
+                .setPositiveButton("Reintentar", (d, w) -> {
+                    videoResolved = false;
+                    triedFallback = false;
+                    if (resolverWebView != null) {
+                        resolverWebView.stopLoading();
+                        FrameLayout c = findViewById(R.id.webview_container);
+                        c.removeView(resolverWebView);
+                        resolverWebView.destroy();
+                        resolverWebView = null;
+                    }
+                    resolveEmbedUrl(embedUrl);
+                })
+                .setNegativeButton("Cerrar", (d, w) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
     private void startExoPlayer(String hlsUrl) {
