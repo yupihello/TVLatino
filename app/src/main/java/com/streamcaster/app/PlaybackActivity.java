@@ -610,7 +610,19 @@ public class PlaybackActivity extends FragmentActivity {
         resolveHandler.postDelayed(pendingTimeoutRunnable, 60000);
 
         Log.d(TAG, "Loading embed URL: " + embedUrl);
-        resolverWebView.loadUrl(embedUrl);
+        // Load the embed inside an iframe wrapper with tvserieslatino.com as baseURL
+        // so the embed sees a proper parent/referer (required for .xyz embeds that
+        // reject top-level loads from unknown origins).
+        String wrapper = "<!DOCTYPE html><html><head><meta name='viewport' "
+                + "content='width=device-width,initial-scale=1'>"
+                + "<style>html,body{margin:0;padding:0;height:100%;background:#000}"
+                + "iframe{border:0;width:100%;height:100%}</style></head><body>"
+                + "<iframe src='" + embedUrl.replace("'", "%27")
+                + "' allow='autoplay; fullscreen' allowfullscreen></iframe>"
+                + "</body></html>";
+        resolverWebView.loadDataWithBaseURL(
+                "https://www.tvserieslatino.com/haz-clic-para-reproducir-el-video-de-abajo/",
+                wrapper, "text/html", "UTF-8", null);
     }
 
     private void cancelResolveTimers() {
