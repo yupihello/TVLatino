@@ -626,12 +626,18 @@ public class PlaybackActivity extends FragmentActivity {
 
     private void showExtractionErrorDialog(String embedUrl) {
         if (isFinishing()) return;
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("No se pudo extraer el video")
-                .setMessage("El servidor no respondió a tiempo. ¿Reintentar?")
+        boolean hasNext = episodeList != null && currentEpisodeIndex >= 0
+                && currentEpisodeIndex + 1 < episodeList.size();
+
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(this)
+                .setTitle("Este episodio no está disponible")
+                .setMessage("Los servidores no entregaron el video. Esto suele ocurrir "
+                        + "cuando el contenido se retira de la fuente. Puedes reintentar "
+                        + "o saltar al siguiente episodio.")
                 .setPositiveButton("Reintentar", (d, w) -> {
                     videoResolved = false;
                     triedFallback = false;
+                    cancelResolveTimers();
                     if (resolverWebView != null) {
                         resolverWebView.stopLoading();
                         FrameLayout c = findViewById(R.id.webview_container);
@@ -642,8 +648,15 @@ public class PlaybackActivity extends FragmentActivity {
                     resolveEmbedUrl(embedUrl);
                 })
                 .setNegativeButton("Cerrar", (d, w) -> finish())
-                .setCancelable(false)
-                .show();
+                .setCancelable(false);
+
+        if (hasNext) {
+            b.setNeutralButton("Siguiente", (d, w) -> {
+                Episode next = episodeList.get(currentEpisodeIndex + 1);
+                playEpisode(next, currentEpisodeIndex + 1);
+            });
+        }
+        b.show();
     }
 
     private void startExoPlayer(String hlsUrl) {
