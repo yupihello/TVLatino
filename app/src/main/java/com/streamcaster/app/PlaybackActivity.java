@@ -95,6 +95,9 @@ public class PlaybackActivity extends FragmentActivity {
     private ContentCache cache;
     private boolean triedFallback = false;
     private boolean shuffleMode = false;
+    private Runnable pendingFallbackRunnable;
+    private Runnable pendingTimeoutRunnable;
+    private final Handler resolveHandler = new Handler(Looper.getMainLooper());
     private final java.util.Random random = new java.util.Random();
 
     private final Runnable hideOverlayRunnable = () -> hideOverlay();
@@ -572,37 +575,53 @@ public class PlaybackActivity extends FragmentActivity {
             }
         });
 
-        // Try fallback server after 15s, give up after 30s total
-        resolverWebView.postDelayed(() -> {
-            if (!videoResolved && !triedFallback) {
-                triedFallback = true;
-                Episode ep = (episodeList != null && currentEpisodeIndex >= 0
-                        && currentEpisodeIndex < episodeList.size())
-                        ? episodeList.get(currentEpisodeIndex) : null;
-                String fallback = ep != null ? ep.getFallbackServerUrl() : null;
-                if (fallback != null && !fallback.isEmpty()) {
-                    Log.d(TAG, "Primary timeout, trying fallback: " + fallback);
-                    // Clean up current WebView
+        // Cancel any leftover timers from a previous resolveAndPlay call
+        cancelResolveTimers();
+
+        pendingFallbackRunnable = () -> {
+            if (videoResolved || triedFallback) return;
+            triedFallback = true;
+            Episode ep = (episodeList != null && currentEpisodeIndex >= 0
+                    && currentEpisodeIndex < episodeList.size())
+                    ? episodeList.get(currentEpisodeIndex) : null;
+            String fallback = ep != null ? ep.getFallbackServerUrl() : null;
+            if (fallback != null && !fallback.isEmpty()) {
+                Log.d(TAG, "Primary timeout, trying fallback: " + fallback);
+                // Cancel the primary's main timeout; fallback will install its own
+                cancelResolveTimers();
+                if (resolverWebView != null) {
                     resolverWebView.stopLoading();
                     FrameLayout c = findViewById(R.id.webview_container);
                     c.removeView(resolverWebView);
                     resolverWebView.destroy();
                     resolverWebView = null;
-                    resolveAndPlay(fallback);
                 }
+                resolveAndPlay(fallback);
             }
-        }, 25000);
+        };
+        resolveHandler.postDelayed(pendingFallbackRunnable, 25000);
 
         final String finalEmbedUrl = embedUrl;
-        resolverWebView.postDelayed(() -> {
-            if (!videoResolved) {
-                Log.w(TAG, "Timeout waiting for video URL");
-                showExtractionErrorDialog(finalEmbedUrl);
-            }
-        }, 60000);
+        pendingTimeoutRunnable = () -> {
+            if (videoResolved) return;
+            Log.w(TAG, "Timeout waiting for video URL");
+            showExtractionErrorDialog(finalEmbedUrl);
+        };
+        resolveHandler.postDelayed(pendingTimeoutRunnable, 60000);
 
         Log.d(TAG, "Loading embed URL: " + embedUrl);
         resolverWebView.loadUrl(embedUrl);
+    }
+
+    private void cancelResolveTimers() {
+        if (pendingFallbackRunnable != null) {
+            resolveHandler.removeCallbacks(pendingFallbackRunnable);
+            pendingFallbackRunnable = null;
+        }
+        if (pendingTimeoutRunnable != null) {
+            resolveHandler.removeCallbacks(pendingTimeoutRunnable);
+            pendingTimeoutRunnable = null;
+        }
     }
 
     private void showExtractionErrorDialog(String embedUrl) {
@@ -628,6 +647,7 @@ public class PlaybackActivity extends FragmentActivity {
     }
 
     private void startExoPlayer(String hlsUrl) {
+        cancelResolveTimers();
         loadingProgress.setVisibility(View.GONE);
         loadingText.setVisibility(View.GONE);
         View loadingLayout = findViewById(R.id.loading_layout);
@@ -724,6 +744,7 @@ public class PlaybackActivity extends FragmentActivity {
     }
 
     private void startExoPlayerDirect(String videoUrl) {
+        cancelResolveTimers();
         loadingProgress.setVisibility(View.GONE);
         loadingText.setVisibility(View.GONE);
         View loadingLayout = findViewById(R.id.loading_layout);
@@ -855,6 +876,7 @@ public class PlaybackActivity extends FragmentActivity {
         super.onDestroy();
         overlayHandler.removeCallbacksAndMessages(null);
         seekUpdateHandler.removeCallbacksAndMessages(null);
+        resolveHandler.removeCallbacksAndMessages(null);
         if (player != null) { player.release(); player = null; }
         if (resolverWebView != null) {
             resolverWebView.stopLoading();

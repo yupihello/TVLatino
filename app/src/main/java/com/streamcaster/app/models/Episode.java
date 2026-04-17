@@ -86,14 +86,36 @@ public class Episode implements Serializable {
     }
 
     /**
-     * Returns the fallback server URL (first one that isn't getBestServerUrl).
+     * Returns the fallback server URL only if it plausibly refers to the same
+     * episode — specifically, a .com/e/SLUG URL where SLUG is also present in
+     * the primary URL, or URLs containing the same season/episode marker.
+     * Prevents falling back to an unrelated episode (e.g. the piloto).
      */
     public String getFallbackServerUrl() {
         String best = getBestServerUrl();
+        if (best == null) return null;
+        String bestLow = best.toLowerCase();
+        String marker = String.format(java.util.Locale.US, "%02dx%02d",
+                seasonNumber, episodeNumber);
         for (String url : serverUrls) {
-            if (!url.equals(best)) return url;
+            if (url.equals(best)) continue;
+            String low = url.toLowerCase();
+            // Accept if the URL contains the SxE marker of the current episode
+            if (low.contains(marker)) return url;
+            // Accept if it shares a slug with primary (best-effort)
+            String slug = extractSlug(bestLow);
+            if (!slug.isEmpty() && low.contains(slug)) return url;
         }
         return null;
+    }
+
+    private static String extractSlug(String url) {
+        int idx = url.indexOf("/e/");
+        if (idx < 0) return "";
+        String rest = url.substring(idx + 3);
+        int slash = rest.indexOf('/');
+        String slug = slash > 0 ? rest.substring(0, slash) : rest;
+        return slug.length() >= 6 ? slug : "";
     }
 
     /** Returns the best thumbnail: TMDB still > scraped thumbnail */
